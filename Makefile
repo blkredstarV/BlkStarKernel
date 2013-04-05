@@ -354,8 +354,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL  = -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon -ftree-vectorize -pipe
-AFLAGS_KERNEL  = -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon -ftree-vectorize -pipe
+CFLAGS_KERNEL  = 
+AFLAGS_KERNEL  = 
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -370,13 +370,10 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
-                   -mno-unaligned-access \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-                   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon \
-                   -ftree-vectorize -pipe \
                    -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -ffast-math \
-                   -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
+                   -mtune=cortex-a15 -fgcse-after-reload \
 		   -fno-delete-null-pointer-checks \
 		   -D_$(TARGET_PRODUCT)_
 
