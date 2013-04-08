@@ -369,12 +369,13 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 KBUILD_CPPFLAGS := -D__KERNEL__
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common \
-		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
-                   -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -ffast-math \
-                   -mtune=cortex-a15 -fgcse-after-reload \
-		   -fno-delete-null-pointer-checks \
+                   -fno-strict-aliasing -fno-common \
+                   -Werror-implicit-function-declaration \
+                   -Wno-format-security \
+                   -fno-delete-null-pointer-checks \
+		   -ftree-vectorize -pipe \
+		   -funswitch-loops -fpredictive-commoning \
+		   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon
 		   -D_$(TARGET_PRODUCT)_
 
 KBUILD_AFLAGS_KERNEL :=
