@@ -351,11 +351,14 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   =
-AFLAGS_MODULE   =
+OPTI_FLAGS	= -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon \
+		  -ffast-math -fsingle-precision-constant \
+		  -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr
+CFLAGS_MODULE   = $(OPTI_FLAGS)
+AFLAGS_MODULE   = $(OPTI_FLAGS)
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL  = 
-AFLAGS_KERNEL  = 
+CFLAGS_KERNEL  = $(OPTI_FLAGS)
+AFLAGS_KERNEL  = $(OPTI_FLAGS)
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
