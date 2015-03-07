@@ -375,11 +375,11 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
                    -fno-strict-aliasing -fno-common \
                    -Werror-implicit-function-declaration \
                    -Wno-format-security \
-                   -fno-delete-null-pointer-checks \
 		   -ftree-vectorize -pipe \
 		   -funswitch-loops -fpredictive-commoning \
-		   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon
-		   -D_$(TARGET_PRODUCT)_
+		   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon \
+                   -fno-delete-null-pointer-checks \
+                   -D_$(TARGET_PRODUCT)_
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
