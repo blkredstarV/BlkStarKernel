@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -fgcse-las -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
-HOSTCXXFLAGS = -O3 -fgcse-las -fgraphite -floop-flatten -floop-parallelize-all -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -fomit-frame-pointer -pipe -floop-nest-optimize
+HOSTCXXFLAGS = -Ofast -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -pipe -floop-nest-optimize
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -330,7 +330,7 @@ include $(srctree)/scripts/Kbuild.include
 
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
-REAL_CC		= $(CROSS_COMPILE)gcc
+CC		= $(CROSS_COMPILE)gcc
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -345,20 +345,17 @@ KALLSYMS	= scripts/kallsyms
 PERL		= perl
 CHECK		= sparse
 
-# Use the wrapper for the compiler.  This wrapper scans for new
-# warnings and causes the build to stop upon encountering them.
-CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
+# Include Graphite Optimizations. Automatically detects if SaberMod
+# toolchain is in use to prevent build errors.
+include $(srctree)/scripts/graphite.mk
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-OPTI_FLAGS	= -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon \
-		  -ffast-math -fsingle-precision-constant \
-		  -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr
-CFLAGS_MODULE   = $(OPTI_FLAGS)
-AFLAGS_MODULE   = $(OPTI_FLAGS)
-LDFLAGS_MODULE  =
-CFLAGS_KERNEL  = $(OPTI_FLAGS)
-AFLAGS_KERNEL  = $(OPTI_FLAGS)
+CFLAGS_MODULE   = -lto -DMODULE
+AFLAGS_MODULE   = -lto -DMODULE
+LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
+CFLAGS_KERNEL	= -floop-nest-optimize -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -funswitch-loops -mcpu=cortex-a15 -mtune=cortex-a15 -marm -mfpu=vfpv3 -mvectorize-with-neon-quad
+AFLAGS_KERNEL	= -floop-nest-optimize -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -funswitch-loops -mcpu=cortex-a15 -mtune=cortex-a15 -marm -mfpu=vfpv3 -mvectorize-with-neon-quad
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -369,20 +366,17 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
                    $(if $(KBUILD_SRC), -I$(srctree)/include) \
                    -include $(srctree)/include/linux/kconfig.h
 
-KBUILD_CPPFLAGS := -D__KERNEL__
+KBUILD_CPPFLAGS := -D__KERNEL__ -Ofast -floop-nest-optimize -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mcpu=cortex-a15 -mtune=cortex-a15 -marm -mfpu=vfpv3 -ftree-vectorize -mvectorize-with-neon-quad
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-                   -fno-strict-aliasing -fno-common \
-                   -Werror-implicit-function-declaration \
-                   -Wno-format-security \
-		   -ftree-vectorize -pipe \
-		   -funswitch-loops -fpredictive-commoning \
-		   -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon \
-                   -fno-delete-null-pointer-checks \
-                   -D_$(TARGET_PRODUCT)_
-
-KBUILD_AFLAGS_KERNEL :=
-KBUILD_CFLAGS_KERNEL :=
+		   -fno-strict-aliasing -fno-common \
+		   -Werror-implicit-function-declaration \
+		   -Wno-format-security \
+		   -fno-delete-null-pointer-checks \
+		   -funswitch-loops -floop-nest-optimize\
+		   --param l1-cache-size=16 --param l1-cache-line-size=16 --param l2-cache-size=1024
+KBUILD_AFLAGS_KERNEL := -floop-nest-optimize -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mcpu=cortex-a15 -mtune=cortex-a15 -marm -mfpu=vfpv3 -ftree-vectorize -mvectorize-with-neon-quad
+KBUILD_CFLAGS_KERNEL := -floop-nest-optimize -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -pipe -mcpu=cortex-a15 -mtune=cortex-a15 -marm -mfpu=vfpv3 -ftree-vectorize -mvectorize-with-neon-quad
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE
