@@ -941,8 +941,16 @@ static int msm_camera_v4l2_dqbuf(struct file *f, void *pctx,
 		return -EACCES;
 	}
 	rc = vb2_dqbuf(&pcam_inst->vid_bufq, pb,  f->f_flags & O_NONBLOCK);
-        if (pb->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
-                /* Reject the buffer if planes array was not allocated */
+
+	if (rc < 0) {
+		pr_err("%s, videobuf_dqbuf returns %d\n", __func__, rc);
+		mutex_unlock(&pcam_inst->inst_lock);
+		return rc;
+	}
+
+	if (pb->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
+		/* Reject the buffer if planes array was not allocated */
+
 		if (pb->m.planes == NULL) {
                         pr_err("%s Planes array is null\n", __func__);
 			mutex_unlock(&pcam_inst->inst_lock);
@@ -2331,14 +2339,17 @@ static int msm_setup_v4l2_event_queue(struct v4l2_fh *eventHandle,
 	INIT_LIST_HEAD(&pvdev->fh_list);
 
 	v4l2_fh_init(eventHandle, pvdev);
-#if 0
+
+#if 0	
 	if (rc < 0)
 		return rc;
+
 	if (eventHandle->events == NULL) {
 		rc = v4l2_event_init(eventHandle);
 		if (rc < 0)
 			return rc;
 	}
+
 	/* queue of max size 30 */
 	rc = v4l2_event_alloc(eventHandle, 30);
 	if (rc < 0)

@@ -3229,12 +3229,14 @@ static void vfe32_process_zsl_frame(void)
 		if (!s_avail)
 		{
 			if(printk_ratelimit())
-				pr_err("%d : zsl no free snapshot buffer\n", __LINE__);
+
+				pr_err("%d : nishu zsl no free snapshot buffer\n", __LINE__);
 		}
 		if (!t_avail)
 		{
 			if(printk_ratelimit())
-				pr_err("%d : zsl no free thumbnail buffer\n", __LINE__);
+
+				pr_err("%d : nishu zsl no free thumbnail buffer\n", __LINE__);
 		}
 	    }
 	    else

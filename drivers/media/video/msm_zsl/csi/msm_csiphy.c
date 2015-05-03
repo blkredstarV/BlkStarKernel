@@ -66,6 +66,9 @@ int msm_csiphy_config(struct csiphy_cfg_params *cfg_params)
 	void __iomem *csiphybase;
 	csiphy_dev = v4l2_get_subdevdata(cfg_params->subdev);
 	csiphybase = csiphy_dev->base;
+	if (csiphybase == NULL)
+		return -ENOMEM;
+
 	csiphy_params = cfg_params->parms;
 	if (csiphy_params->lane_cnt < 1 || csiphy_params->lane_cnt > 4) {
 		CDBG("%s: unsupported lane cnt %d\n",

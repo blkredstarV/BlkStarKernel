@@ -93,6 +93,8 @@ static int msm_csid_config(struct csid_cfg_params *cfg_params)
 	void __iomem *csidbase;
 	csid_dev = v4l2_get_subdevdata(cfg_params->subdev);
 	csidbase = csid_dev->base;
+	if (csidbase == NULL)
+		return -ENOMEM;
 	csid_params = cfg_params->parms;
 	val = csid_params->lane_cnt - 1;
 	val |= csid_params->lane_assign << 2;
@@ -319,9 +321,11 @@ static int __devinit csid_probe(struct platform_device *pdev)
 
 	return 0;
 ioremap_fail:
-		release_mem_region(new_csid_dev->mem->start,
-			resource_size(new_csid_dev->mem));
+
 csid_no_resource:
+	release_mem_region(new_csid_dev->mem->start,
+		resource_size(new_csid_dev->mem));
+
 	mutex_destroy(&new_csid_dev->mutex);
 	kfree(new_csid_dev);
 	return 0;
